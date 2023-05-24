@@ -1,1 +1,3 @@
-# graph-dynamic-earth-net
+# Graph Dynamic Earth Net
+
+Dataset and code source are in comming.
