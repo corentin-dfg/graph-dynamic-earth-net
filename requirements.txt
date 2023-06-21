@@ -1,0 +1,11 @@
+matplotlib
+numpy
+opencv-contrib-python
+plotly
+pyg-lib
+rasterio
+scikit-image
+scikit-learn
+tensorboard
+torch
+tqdm
