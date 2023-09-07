@@ -12,7 +12,7 @@ class ToTensorScaled(object):
         return torch.from_numpy(im)
 
 class GraphDynamicEarthNet(pyg.data.Dataset):
-    def __init__(self, den_root, gden_root, mode, k_slic=30, smoothness=100):
+    def __init__(self, den_root, gden_root, mode, n_segments=1000, compactness=0.1):
         """
         A dataset that built spatio-temporal graph from the SITS of Dynamic Earth Net
         Args:
@@ -27,8 +27,8 @@ class GraphDynamicEarthNet(pyg.data.Dataset):
         self.den_root = den_root
         self.gden_root = gden_root
 
-        self.k_slic = k_slic
-        self.smoothness = smoothness
+        self.n_segments = n_segments
+        self.compactness = compactness
         self.scalete = ToTensorScaled()
 
         # Statistics computed from the Dynamic Earth Net dataset to allow normalization
@@ -73,7 +73,7 @@ class GraphDynamicEarthNet(pyg.data.Dataset):
     def process(self):
         print("Generation of spatio-temporal graphs from DynamicEarthNet's datacubes...")
         for i in tqdm(range(len(self.processed_file_names))):
-            data = STG(os.path.join(self.den_root,self.raw_file_names[i]), os.path.join(self.den_root,self.label_file_names[i]), k_slic=self.k_slic, smoothness=self.smoothness)
+            data = STG(os.path.join(self.den_root,self.raw_file_names[i]), os.path.join(self.den_root,self.label_file_names[i]), n_segments=self.n_segments, compactness=self.compactness)
             torch.save(data, os.path.join(self.gden_root, "processed/", self.processed_file_names[i]))
 
     def get(self, i):

@@ -11,16 +11,19 @@ The results highlight the efficiency of graph models in understanding the spatio
 
 |       | skip<br>cnnct.  | attnt.                | Nb. of<br>params | Impervious IoU|Agriculture IoU|Forest IoU|Wetlands IoU|Soil IoU|Water IoU | Test<br>mIoU (&uarr;)   | Test<br>Accuracy (&uarr;)   |
 | ---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **RF**    | -      | -                     | -      | 23.07<sub>&plusmn;0.11</sub>    | 0.73<sub>&plusmn;0.03</sub>       | 36.13<sub>&plusmn;0.08</sub> | 0.01<sub>&plusmn;0.04</sub> | 41.04<sub>&plusmn;0.08</sub> | 72.53<sub>&plusmn;0.23</sub> | 28.92<sub>&plusmn;0.06</sub>    | 52.17<sub>&plusmn;0.06</sub>        |
-| **MLP**   | -      | -                     | 205k   | 25.21<sub>&plusmn;2.34</sub>    | 0.56<sub>&plusmn;0.25</sub>       | 42.93<sub>&plusmn;1.62</sub> | 0.02<sub>&plusmn;0.04</sub> | 46.61<sub>&plusmn;1.48</sub> | **74.05**<sub>&plusmn;1.60</sub> | 31.57<sub>&plusmn;0.58</sub>    | 57.75<sub>&plusmn;0.89</sub>        |
-| **GCN**   | &cross; | &cross;                | 205k   | 2.19<sub>&plusmn;3.76</sub>     | 0.08<sub>&plusmn;0.13</sub>       | 40.65<sub>&plusmn;3.13</sub> | 0.01<sub>&plusmn;0.03</sub> | 37.60<sub>&plusmn;1.87</sub> | 42.02<sub>&plusmn;1.99</sub> | 20.43<sub>&plusmn;0.50</sub>    | 50.69<sub>&plusmn;2.35</sub>        |
-| **GSAGE** | &check; | &cross;                | 406k   | <u>30.07</u><sub>&plusmn;3.25</sub> | 1.00<sub>&plusmn;0.80</sub>       | <u>48.50</u><sub>&plusmn;4.22</sub> | 0.17<sub>&plusmn;0.28</sub> | <u>48.67</u><sub>&plusmn;2.05</sub> | 69.90<sub>&plusmn;2.63</sub> | <u>33.06</u><sub>&plusmn;1.46</sub> | <u>60.22</u><sub>&plusmn;2.21</sub>    |
-| **GAT**   | &cross; | &check;                | 207k   | 2.19<sub>&plusmn;1.25</sub>     | 0.08<sub>&plusmn;0.12</sub>       | 39.24<sub>&plusmn;2.68</sub> | 0.00<sub>&plusmn;0.00</sub> | 37.05<sub>&plusmn;2.75</sub> | 41.84<sub>&plusmn;1.71</sub> | 20.07<sub>&plusmn;0.84</sub>    | 49.38<sub>&plusmn;1.98</sub>        |
-**ResGGCN** | &check; | &check; | 811k | 28.17<sub>&plusmn;2.09</sub> | **2.84**<sub>&plusmn;1.31</sub> | 46.95<sub>&plusmn;1.76</sub> | **0.26**<sub>&plusmn;0.52</sub> | 45.86<sub>&plusmn;1.77</sub> | <u>72.74</u><sub>&plusmn;1.87</sub> | 32.80<sub>&plusmn;0.67</sub> | 59.92<sub>&plusmn;0.89</sub> |
-**GT** | &check; | &check; | 2115k | **32.53**<sub>&plusmn;3.09</sub> | <u>1.84</u><sub>&plusmn;1.94</sub> | **50.40**<sub>&plusmn;2.93</sub> | <u>0.23</u><sub>&plusmn;0.52</sub> | **49.74**<sub>&plusmn;3.01</sub> | 71.17<sub>&plusmn;3.16</sub> | **34.31**<sub>&plusmn;1.57</sub> | **61.82**<sub>&plusmn;2.89</sub> |
+| **RF**    | -      | -                     | -      | 22.86<sub>&plusmn;0.38</sub>    | 3.28<sub>&plusmn;0.08</sub>       | 34.73<sub>&plusmn;0.14</sub> | 0.31<sub>&plusmn;0.14</sub> | 41.97<sub>&plusmn;0.33</sub> | 77.28<sub>&plusmn;0.47</sub> | 30.07<sub>&plusmn;0.10</sub>    | 51.95<sub>&plusmn;0.17</sub>        |
+| **MLP**   | -      | -                     | 205k   | 19.51<sub>&plusmn;3.11</sub>    | 0.85<sub>&plusmn;0.56</sub>       | 41.86<sub>&plusmn;1.59</sub> | 0.43<sub>&plusmn;0.71</sub> | <ins>48.92</ins><sub>&plusmn;1.60</sub> | 80.75<sub>&plusmn;2.24</sub> | 32.05<sub>&plusmn;0.46</sub>    | 58.33<sub>&plusmn;1.37</sub>        |
+| **GCN**   | &cross; | &cross;                | 205k   | 13.94<sub>&plusmn;4.44</sub>     | 1.73<sub>&plusmn;2.22</sub>       | 40.14<sub>&plusmn;1.56</sub> | 0.00<sub>&plusmn;0.00</sub> | 44.75<sub>&plusmn;1.03</sub> | 66.62<sub>&plusmn;2.18</sub> | 27.86<sub>&plusmn;1.23</sub>    | 55.69<sub>&plusmn;1.40</sub>        |
+| **GSAGE** | &check; | &cross;                | 406k   | <ins>28.36</ins><sub>&plusmn;4.21</sub> | <ins>4.86</ins><sub>&plusmn;2.38</sub>       | **47.27**<sub>&plusmn;3.04</sub> | 0.86<sub>&plusmn;0.55</sub> | **51.97**<sub>&plusmn;2.15</sub> | <ins>83.46</ins><sub>&plusmn;1.51</sub> | **36.13**<sub>&plusmn;1.33</sub> | **63.01**<sub>&plusmn;2.06</sub>    |
+| **GAT**   | &cross; | &check;                | 207k   | 20.96<sub>&plusmn;4.84</sub>     | **9.88**<sub>&plusmn;5.28</sub>       | 41.07<sub>&plusmn;2.82</sub> | <ins>2.11</ins><sub>&plusmn;1.74</sub> | 47.86<sub>&plusmn;2.66</sub> | 76.61<sub>&plusmn;5.15</sub> | 33.08<sub>&plusmn;2.15</sub>    | 58.42<sub>&plusmn;2.32</sub>        |
+**ResGGCN** | &check; | &check; | 811k | **30.13**<sub>&plusmn;5.92</sub> | 4.65<sub>&plusmn;3.26</sub> | <ins>43.93</ins><sub>&plusmn;3.62</sub> | **3.28**<sub>&plusmn;1.99</sub> | 48.89<sub>&plusmn;4.56</sub> | **83.93**<sub>&plusmn;1.38</sub> | <ins>35.81</ins><sub>&plusmn;1.91</sub> | <ins>60.19</ins><sub>&plusmn;3.65</sub> |
+**GT** | &check; | &check; | 2115k | 3.70<sub>&plusmn;5.93</sub> | 4.71<sub>&plusmn;6.82</sub> | 40.80<sub>&plusmn;16.17</sub> | 0.06<sub>&plusmn;0.18</sub> | 27.32<sub>&plusmn;18.86</sub> | 40.78<sub>&plusmn;25.52</sub> | 19.55<sub>&plusmn;2.16</sub> | 47.23<sub>&plusmn;10.04</sub> |
 
 **Table:** *IoU and Accuracy performance on the test set of attribute-based and GNN models. The results are provided with average and standard deviation on ten random initializations (__best__, <u>second best</u>).*
 
+
+> [!IMPORTANT]  
+> :warning: **Disclaimer on IGARSS paper results:** The results provided here override those of the original paper by fixing a problem in graph creation.
 
 <br>
 

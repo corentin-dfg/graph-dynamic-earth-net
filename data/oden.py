@@ -4,7 +4,7 @@ import torch_geometric as pyg
 from data.gden import GraphDynamicEarthNet
 
 class ObjectDynamicEarthNet(torch.utils.data.Dataset):
-    def __init__(self, den_root, gden_root, mode, k_slic=30, smoothness=100):
+    def __init__(self, den_root, gden_root, mode, n_segments=1000, compactness=0.1):
         """
         Dataset built from Graph Dynamic Earth Net by group all region features independently of their neighborhood
         Args:
@@ -15,7 +15,7 @@ class ObjectDynamicEarthNet(torch.utils.data.Dataset):
         If the gden_root already contains the preprocessed spatio-temporal graph, the dataset will automatically load it.
         """
         self.gden = GraphDynamicEarthNet(den_root=den_root, gden_root=gden_root, mode=mode,
-                                    k_slic=k_slic, smoothness=smoothness)
+                                    n_segments=n_segments, compactness=compactness)
         self.x = torch.zeros((0,16))
         self.y = torch.zeros((0,7))
         for stg in self.gden:

@@ -25,11 +25,11 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     data_config = config['DATA']
 
     train_data = ObjectDynamicEarthNet(den_root=data_config['DEN_ROOT'], gden_root=data_config['GDEN_ROOT'], mode=data_config['TRAIN_SUBSET'],
-                                        k_slic=data_config["SLIC_K"], smoothness=data_config["SLIC_SMOOTHNESS"])
+                                        n_segments=data_config["SLIC_SEGMENTS"], compactness=data_config["SLIC_COMPACTNESS"])
     val_data = ObjectDynamicEarthNet(den_root=data_config['DEN_ROOT'], gden_root=data_config['GDEN_ROOT'], mode=data_config['VAL_SUBSET'],
-                                        k_slic=data_config["SLIC_K"], smoothness=data_config["SLIC_SMOOTHNESS"])
+                                        n_segments=data_config["SLIC_SEGMENTS"], compactness=data_config["SLIC_COMPACTNESS"])
     test_data = ObjectDynamicEarthNet(den_root=data_config['DEN_ROOT'], gden_root=data_config['GDEN_ROOT'], mode=data_config['TEST_SUBSET'],
-                                        k_slic=data_config["SLIC_K"], smoothness=data_config["SLIC_SMOOTHNESS"])
+                                        n_segments=data_config["SLIC_SEGMENTS"], compactness=data_config["SLIC_COMPACTNESS"])
     
     log_print(f"Load datasets from {data_config['GDEN_ROOT']}: train_set={len(train_data)} val_set={len(val_data)}")
 

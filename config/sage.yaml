@@ -1,8 +1,8 @@
 DATA:
   DEN_ROOT: 'datasets/den/'
   GDEN_ROOT: 'datasets/gden/'
-  SLIC_K: 30
-  SLIC_SMOOTHNESS: 100
+  SLIC_SEGMENTS: 1000
+  SLIC_COMPACTNESS: 0.1
   TRAIN_SUBSET: 'train'
   VAL_SUBSET: 'val'
   TEST_SUBSET: 'test'

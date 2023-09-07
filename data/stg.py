@@ -7,9 +7,7 @@ import torch
 import torch.nn.functional as F
 import torch_geometric as pyg
 
-from skimage import filters
-from skimage.future import graph
-import cv2
+from skimage import segmentation, morphology
 from scipy.ndimage import center_of_mass
 
 import rasterio
@@ -24,7 +22,7 @@ class STG(pyg.data.HeteroData):
     `label_mode` can be 'multi', 'majority' or 'center' depending if multilabel or monolabel is enable.
     We can save or not the superpixel map of the SITS to allow a faster reconstruction (without rerun the superpixel algorithm) of the datacube from the STG but it needs more memory to store it."""
 
-    def __init__(self, img_dir=None, label_dir=None, k_slic=30, smoothness=100, save_spxl=True):
+    def __init__(self, img_dir=None, label_dir=None, n_segments=1000, compactness=0.1, save_spxl=True):
         super().__init__()
 
         if not img_dir is None and not label_dir is None: 
@@ -36,7 +34,7 @@ class STG(pyg.data.HeteroData):
             num_nodes = 0
 
             # Compute the first date graph
-            x1, edge_index1, edge_attr1, y1, sp_order1, superpixels1, pos1 = STG.__img_to_graph__(ts_imgs[0],ts_labels[0], k_slic, smoothness)
+            x1, edge_index1, edge_attr1, y1, sp_order1, superpixels1, pos1 = STG.__img_to_graph__(ts_imgs[0],ts_labels[0], n_segments, compactness)
             pos = torch.cat((pos1,torch.zeros((x1.shape[0],1))),dim=1)
             spxl = superpixels1[:,:,None]
             edge_temp_index1 = torch.zeros((2,0))
@@ -48,7 +46,7 @@ class STG(pyg.data.HeteroData):
                 num_nodes += num_nodes1
 
                 # Get the spatial graph at time j
-                x2, edge_index2, edge_attr2, y2, sp_order2, superpixels2, pos2 = STG.__img_to_graph__(ts_imgs[j],ts_labels[j], k_slic, smoothness)
+                x2, edge_index2, edge_attr2, y2, sp_order2, superpixels2, pos2 = STG.__img_to_graph__(ts_imgs[j],ts_labels[j], n_segments, compactness)
 
                 # Concatenate new spatial graph to the STG
                 edge_index2 += num_nodes
@@ -69,12 +67,14 @@ class STG(pyg.data.HeteroData):
                         ),dim=0)
                     ,dim=1, return_counts=True)
                 
+                edge_temp_index2, inter = pyg.utils.to_undirected(edge_temp_index2, inter)
+
                 _, count1 = torch.unique(torch.as_tensor(superpixels1.reshape((1,-1))), return_counts=True)
                 _, count2 = torch.unique(torch.as_tensor(superpixels2.reshape((1,-1))), return_counts=True)
-                iou = inter / (count1[edge_temp_index2[0]-(num_nodes-num_nodes1)]+count2[edge_temp_index2[1]-num_nodes]-inter)
+                edge_temp_attr2 = (inter/torch.cat((count1,count2))[edge_temp_index2[0]-(num_nodes-num_nodes1)])[:,None]
 
                 edge_temp_index1 = torch.cat((edge_temp_index1,edge_temp_index2),dim=1)
-                edge_temp_attr1 = torch.cat((edge_temp_attr1, iou[:,None]),dim=0)
+                edge_temp_attr1 = torch.cat((edge_temp_attr1, edge_temp_attr2),dim=0)
                 
                 superpixels1 = superpixels2
                 num_nodes1 = len(sp_order2)
@@ -94,18 +94,11 @@ class STG(pyg.data.HeteroData):
             if save_spxl:
                 self.superpixels = spxl # Save each superpixels map
 
-    def __slic_by_cv2__(arr, region_size, smoothness, num_iter=10):
-        slic_obj = cv2.ximgproc.createSuperpixelSLIC(arr, algorithm=cv2.ximgproc.SLIC, region_size=region_size, ruler=smoothness)
-        slic_obj.iterate(num_iter)
-        superpixels = slic_obj.getLabels()
+    def __slic__(arr, numsuperpixels, compactness):
+        superpixels = segmentation.slic(arr, n_segments=numsuperpixels, compactness=compactness, min_size_factor=0.25, max_size_factor=1.0,  convert2lab=False, enforce_connectivity=True, channel_axis=2)
+        return superpixels-1
 
-        #Remap superpixels labels to have continuous values (Faster implementation than np.vectorize)
-        u,inv = np.unique(superpixels,return_inverse = True)
-        d = dict(zip(u,range(len(u))))
-        superpixels = np.array([d[x] for x in u])[inv].reshape(superpixels.shape)
-        return superpixels
-
-    def __img_to_graph__(raw_path, gt_path, k_slic, smoothness):
+    def __img_to_graph__(raw_path, gt_path, n_segments, compactness):
         # Opening data image and its corresponding labels
         with rasterio.open(raw_path, 'r') as tif:
             img = tif.read().transpose((1,2,0))-1
@@ -113,21 +106,14 @@ class STG(pyg.data.HeteroData):
             gt = tif.read().transpose((1,2,0))/255
             
         # Processing superpixel algorithm on multispectral input
-        superpixels = STG.__slic_by_cv2__(img.astype(np.float32), k_slic, smoothness)
-
-        # Creating region adjacency graph based on boundary
-        gimg = np.mean(img,axis=-1)
-        edges = filters.sobel(gimg)
-        
-        g = graph.rag_boundary(superpixels, edges)
-
+        superpixels = STG.__slic__(img.astype(np.float32), n_segments, compactness)
         superpixels = torch.tensor(superpixels, dtype=torch.int)
-        sp_order = torch.unique(superpixels)[list(g.nodes)]
+        sp_order = torch.unique(superpixels)
 
         n_ch = img.shape[-1]
 
         # Processing the node features and label
-        sp_intensity, sp_coord, sp_label = [], [], []
+        sp_intensity, sp_coord, sp_label, perim = [], [], [], []
         for seg in sp_order:
             mask = (superpixels == seg).squeeze()
             avg_value = torch.zeros(n_ch)
@@ -154,13 +140,26 @@ class STG(pyg.data.HeteroData):
         x = torch.stack(sp_intensity)
         y = torch.as_tensor(np.array(sp_label))
 
-        edge_index = torch.tensor(list(g.edges),dtype=torch.long).T
+        # Processing the edge indices with a RAG and compute the edge weights (shared perimeter/target's perimeter)
+        superpixels_bordered = np.full((superpixels.shape[0]+2,superpixels.shape[1]+2),-1)
+        superpixels_bordered[1:-1,1:-1] = superpixels
+        eroded = morphology.erosion(superpixels_bordered)
+        dilated = morphology.dilation(superpixels_bordered)
+        boundaries0 = (eroded != superpixels_bordered)
+        boundaries1 = (dilated != superpixels_bordered)
+        labels_small = torch.as_tensor(np.concatenate((eroded[boundaries0], superpixels_bordered[boundaries1])))
+        labels_large = torch.as_tensor(np.concatenate((superpixels_bordered[boundaries0], dilated[boundaries1])))
 
-        edge_attr = torch.cat((
-                torch.tensor(list(g.edges.data("weight")),dtype=torch.float)[:,2,None],
-                torch.tensor(list(g.edges.data("count")),dtype=torch.float)[:,2,None]
-            ),dim=1).float()
-        
+        edge_index, inter = torch.unique(torch.stack((labels_small,labels_large)),dim=1, return_counts=True)
+        inter = inter[edge_index[0,:]!=-1]
+        edge_index = edge_index[:,edge_index[0,:]!=-1]
+
+        _, perim = torch.unique(torch.stack((labels_small,labels_large)), return_counts=True)
+        perim = perim[1:]
+
+        edge_index, inter = pyg.utils.to_undirected(edge_index,inter[:,None])
+        edge_attr = inter/perim[edge_index[1,:]][:,None]
+                
         return x, edge_index, edge_attr, y, sp_order, superpixels, torch.stack(sp_coord)
 
     def datacube_from_node_classification(self,node_pred):

@@ -31,11 +31,11 @@ def main(opts: Any, config: Mapping[Text, Any]) -> None:
     LABEL_NAMES = ["impervious surface", "agriculture", "forest & other vegetation", "wetlands", "soil", "water", "snow & ice"]
 
     train_data = GraphDynamicEarthNet(den_root=data_config['DEN_ROOT'], gden_root=data_config['GDEN_ROOT'], mode=data_config["TRAIN_SUBSET"],
-                                    k_slic=data_config["SLIC_K"], smoothness=data_config["SLIC_SMOOTHNESS"])
+                                    n_segments=data_config["SLIC_SEGMENTS"], compactness=data_config["SLIC_COMPACTNESS"])
     val_data = GraphDynamicEarthNet(den_root=data_config['DEN_ROOT'], gden_root=data_config['GDEN_ROOT'], mode=data_config["VAL_SUBSET"],
-                                    k_slic=data_config["SLIC_K"], smoothness=data_config["SLIC_SMOOTHNESS"])
+                                    n_segments=data_config["SLIC_SEGMENTS"], compactness=data_config["SLIC_COMPACTNESS"])
     test_data = GraphDynamicEarthNet(den_root=data_config['DEN_ROOT'], gden_root=data_config['GDEN_ROOT'], mode=data_config["TEST_SUBSET"],
-                                    k_slic=data_config["SLIC_K"], smoothness=data_config["SLIC_SMOOTHNESS"])
+                                    n_segments=data_config["SLIC_SEGMENTS"], compactness=data_config["SLIC_COMPACTNESS"])
 
     collate_fn = lambda x: pad.pad_collate(x, pad_value=config['NETWORK']['PAD_VALUE'])
     train_loader = pyg.loader.DataLoader(train_data, batch_size=config['TRAINING']['BATCH_SIZE'],
