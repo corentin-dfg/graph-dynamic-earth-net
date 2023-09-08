@@ -112,7 +112,7 @@ The split used for the data is given in folder ```datasets/den/splits/```. The s
 
 ## Citation
 
-:page_with_curl: Paper in coming
+:page_with_curl: Paper coming soon
 <!--```
 @INPROCEEDINGS{dufourg2023graph,
   author={Dufourg, Corentin and Pelletier, Charlotte and May, Stéphane and Lefèvre, Sébastien},
