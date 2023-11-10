@@ -2,7 +2,7 @@
 
 # Graph Dynamic Earth Net: Spatio-Temporal Graph Benchmark for Satellite Image Time Series
 
-Source code for the paper "**[Graph Dynamic Earth Net: Spatio-Temporal Graph Benchmark for Satellite Image Time Series](https://2023.ieeeigarss.org/index.php)**" by _[Corentin Dufourg](https://www.linkedin.com/in/corentin-dufourg/), [Charlotte Pelletier](https://sites.google.com/site/charpelletier), Stéphane May and [Sébastien Lefèvre](http://people.irisa.fr/Sebastien.Lefevre/)_, at **International Geoscience and Remote Sensing Symposium 2023 (IGARSS 2023)**.
+Source code for the paper "**[Graph Dynamic Earth Net: Spatio-Temporal Graph Benchmark for Satellite Image Time Series](https://ieeexplore.ieee.org/abstract/document/10281458)**" by _[Corentin Dufourg](https://www.linkedin.com/in/corentin-dufourg/), [Charlotte Pelletier](https://sites.google.com/site/charpelletier), Stéphane May and [Sébastien Lefèvre](http://people.irisa.fr/Sebastien.Lefevre/)_, at **International Geoscience and Remote Sensing Symposium 2023 ([IGARSS 2023](https://2023.ieeeigarss.org/index.php))**.
 
 We propose a comparison of five graph neural networks applied to spatio-temporal graphs built from satellite image time series.  
 The results highlight the efficiency of graph models in understanding the spatio-temporal context of regions, which might lead to a better classification compared to attribute-based methods.
@@ -112,14 +112,16 @@ The split used for the data is given in folder ```datasets/den/splits/```. The s
 
 ## Citation
 
-:page_with_curl: Paper coming soon
-<!--```
-@INPROCEEDINGS{dufourg2023graph,
+If you use this work, consider citing our [paper](https://ieeexplore.ieee.org/abstract/document/10281458):
+
+```latex
+@inproceedings{dufourg2023graphdynamicearthnet,
   author={Dufourg, Corentin and Pelletier, Charlotte and May, Stéphane and Lefèvre, Sébastien},
   booktitle={IGARSS 2023 - 2023 IEEE International Geoscience and Remote Sensing Symposium}, 
   title={Graph Dynamic Earth Net: Spatio-Temporal Graph Benchmark for Satellite Image Time Series}, 
-  year={2023}
+  year={2023},
+  pages={7164-7167},
+  doi={10.1109/IGARSS52108.2023.10281458}
 }
-```-->
-
+```
 
